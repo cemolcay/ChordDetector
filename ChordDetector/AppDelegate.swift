@@ -7,6 +7,8 @@
 //
 
 import Cocoa
+import Fabric
+import Crashlytics
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -21,6 +23,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       button.image = NSImage(named: "menuBar")
       button.imageScaling = .scaleProportionallyUpOrDown
     }
+
+    // Fabric
+    Fabric.with([Crashlytics.self])
   }
 
   // MARK: Menu

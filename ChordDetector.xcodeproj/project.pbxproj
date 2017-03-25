@@ -100,6 +100,7 @@
 				B27643A51E8494DB00B67425 /* Resources */,
 				2CC3CCCC95854AE99F8E8B3C /* [CP] Embed Pods Frameworks */,
 				B003C2B5475D05DEE18BA2FE /* [CP] Copy Pods Resources */,
+				B2C3DA611E85F99900BD3074 /* Crashlytics */,
 			);
 			buildRules = (
 			);
@@ -192,6 +193,20 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ChordDetector/Pods-ChordDetector-resources.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		B2C3DA611E85F99900BD3074 /* Crashlytics */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = Crashlytics;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Fabric/run\" e221289244d971094d2d79277c2b57efd5d70441 433e77ef99651fed911c1c25b27f85621fc2581c07cfb4f9761c49b14b352486";
 		};
 		BB8921A779C399F68EF80201 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

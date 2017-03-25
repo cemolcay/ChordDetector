@@ -16,12 +16,13 @@
 
 /* Begin PBXFileReference section */
 		AAD4827915C46A82C140568B /* Pods-ChordDetector.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChordDetector.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ChordDetector/Pods-ChordDetector.debug.xcconfig"; sourceTree = "<group>"; };
-		B27643A71E8494DB00B67425 /* ChordDetector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChordDetector.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B27643A71E8494DB00B67425 /* Chord Detector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Chord Detector.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B27643AA1E8494DB00B67425 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B27643AE1E8494DB00B67425 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B27643B11E8494DB00B67425 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B27643B31E8494DB00B67425 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B27643B91E8494F100B67425 /* ChordDetector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChordDetector.swift; sourceTree = "<group>"; };
+		B2C3DA601E85F6F800BD3074 /* Chord Detector.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Chord Detector.entitlements"; sourceTree = "<group>"; };
 		B5788AC5160F3BE612FD0EFB /* Pods_ChordDetector.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ChordDetector.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAF55655FE24983F250DBA15 /* Pods-ChordDetector.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChordDetector.release.xcconfig"; path = "Pods/Target Support Files/Pods-ChordDetector/Pods-ChordDetector.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -60,7 +61,7 @@
 		B27643A81E8494DB00B67425 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B27643A71E8494DB00B67425 /* ChordDetector.app */,
+				B27643A71E8494DB00B67425 /* Chord Detector.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -68,6 +69,7 @@
 		B27643A91E8494DB00B67425 /* ChordDetector */ = {
 			isa = PBXGroup;
 			children = (
+				B2C3DA601E85F6F800BD3074 /* Chord Detector.entitlements */,
 				B27643AA1E8494DB00B67425 /* AppDelegate.swift */,
 				B27643B91E8494F100B67425 /* ChordDetector.swift */,
 				B27643AE1E8494DB00B67425 /* Assets.xcassets */,
@@ -105,7 +107,7 @@
 			);
 			name = ChordDetector;
 			productName = ChordDetector;
-			productReference = B27643A71E8494DB00B67425 /* ChordDetector.app */;
+			productReference = B27643A71E8494DB00B67425 /* Chord Detector.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -122,6 +124,11 @@
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = 77Y3N48SNF;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -322,13 +329,15 @@
 			baseConfigurationReference = AAD4827915C46A82C140568B /* Pods-ChordDetector.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "ChordDetector/Chord Detector.entitlements";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 77Y3N48SNF;
 				INFOPLIST_FILE = ChordDetector/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				PRODUCT_BUNDLE_IDENTIFIER = com.chordDetector.ChordDetector;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.cemolcay.chordDetector;
+				PRODUCT_NAME = "Chord Detector";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -338,13 +347,15 @@
 			baseConfigurationReference = DAF55655FE24983F250DBA15 /* Pods-ChordDetector.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "ChordDetector/Chord Detector.entitlements";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 77Y3N48SNF;
 				INFOPLIST_FILE = ChordDetector/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				PRODUCT_BUNDLE_IDENTIFIER = com.chordDetector.ChordDetector;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.cemolcay.chordDetector;
+				PRODUCT_NAME = "Chord Detector";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;

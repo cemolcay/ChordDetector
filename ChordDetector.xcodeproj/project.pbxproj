@@ -8,18 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		B27643AB1E8494DB00B67425 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27643AA1E8494DB00B67425 /* AppDelegate.swift */; };
-		B27643AD1E8494DB00B67425 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27643AC1E8494DB00B67425 /* ViewController.swift */; };
 		B27643AF1E8494DB00B67425 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B27643AE1E8494DB00B67425 /* Assets.xcassets */; };
 		B27643B21E8494DB00B67425 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B27643B01E8494DB00B67425 /* Main.storyboard */; };
+		B27643BA1E8494F100B67425 /* ChordDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27643B91E8494F100B67425 /* ChordDetector.swift */; };
+		F36CEB095625B31CCCC3DF3D /* Pods_ChordDetector.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5788AC5160F3BE612FD0EFB /* Pods_ChordDetector.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AAD4827915C46A82C140568B /* Pods-ChordDetector.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChordDetector.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ChordDetector/Pods-ChordDetector.debug.xcconfig"; sourceTree = "<group>"; };
 		B27643A71E8494DB00B67425 /* ChordDetector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChordDetector.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B27643AA1E8494DB00B67425 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		B27643AC1E8494DB00B67425 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		B27643AE1E8494DB00B67425 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B27643B11E8494DB00B67425 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B27643B31E8494DB00B67425 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B27643B91E8494F100B67425 /* ChordDetector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChordDetector.swift; sourceTree = "<group>"; };
+		B5788AC5160F3BE612FD0EFB /* Pods_ChordDetector.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ChordDetector.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAF55655FE24983F250DBA15 /* Pods-ChordDetector.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChordDetector.release.xcconfig"; path = "Pods/Target Support Files/Pods-ChordDetector/Pods-ChordDetector.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -27,17 +31,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F36CEB095625B31CCCC3DF3D /* Pods_ChordDetector.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0E6F0497F49B2399A2B68496 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				AAD4827915C46A82C140568B /* Pods-ChordDetector.debug.xcconfig */,
+				DAF55655FE24983F250DBA15 /* Pods-ChordDetector.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		B276439E1E8494DB00B67425 = {
 			isa = PBXGroup;
 			children = (
 				B27643A91E8494DB00B67425 /* ChordDetector */,
 				B27643A81E8494DB00B67425 /* Products */,
+				0E6F0497F49B2399A2B68496 /* Pods */,
+				D9CDBE4CA4F7558F8A5B3A9D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -53,12 +69,20 @@
 			isa = PBXGroup;
 			children = (
 				B27643AA1E8494DB00B67425 /* AppDelegate.swift */,
-				B27643AC1E8494DB00B67425 /* ViewController.swift */,
+				B27643B91E8494F100B67425 /* ChordDetector.swift */,
 				B27643AE1E8494DB00B67425 /* Assets.xcassets */,
 				B27643B01E8494DB00B67425 /* Main.storyboard */,
 				B27643B31E8494DB00B67425 /* Info.plist */,
 			);
 			path = ChordDetector;
+			sourceTree = "<group>";
+		};
+		D9CDBE4CA4F7558F8A5B3A9D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B5788AC5160F3BE612FD0EFB /* Pods_ChordDetector.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -68,9 +92,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B27643B61E8494DB00B67425 /* Build configuration list for PBXNativeTarget "ChordDetector" */;
 			buildPhases = (
+				BB8921A779C399F68EF80201 /* [CP] Check Pods Manifest.lock */,
 				B27643A31E8494DB00B67425 /* Sources */,
 				B27643A41E8494DB00B67425 /* Frameworks */,
 				B27643A51E8494DB00B67425 /* Resources */,
+				2CC3CCCC95854AE99F8E8B3C /* [CP] Embed Pods Frameworks */,
+				B003C2B5475D05DEE18BA2FE /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -128,13 +155,61 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2CC3CCCC95854AE99F8E8B3C /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ChordDetector/Pods-ChordDetector-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B003C2B5475D05DEE18BA2FE /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ChordDetector/Pods-ChordDetector-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BB8921A779C399F68EF80201 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		B27643A31E8494DB00B67425 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B27643AD1E8494DB00B67425 /* ViewController.swift in Sources */,
 				B27643AB1E8494DB00B67425 /* AppDelegate.swift in Sources */,
+				B27643BA1E8494F100B67425 /* ChordDetector.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -244,12 +319,14 @@
 		};
 		B27643B71E8494DB00B67425 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AAD4827915C46A82C140568B /* Pods-ChordDetector.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 77Y3N48SNF;
 				INFOPLIST_FILE = ChordDetector/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chordDetector.ChordDetector;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
@@ -258,12 +335,14 @@
 		};
 		B27643B81E8494DB00B67425 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DAF55655FE24983F250DBA15 /* Pods-ChordDetector.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 77Y3N48SNF;
 				INFOPLIST_FILE = ChordDetector/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chordDetector.ChordDetector;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
@@ -289,6 +368,7 @@
 				B27643B81E8494DB00B67425 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

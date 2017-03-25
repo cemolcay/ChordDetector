@@ -128,21 +128,20 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
     var url = "https://www.ultimate-guitar.com/search.php?search_type=title&order=&value="
     url += "\(artist.replacingOccurrences(of: " ", with: "+"))+"
     url += "\(song.replacingOccurrences(of: " ", with: "+"))"
-    print(url)
+
     guard let chordUrl = URL(string: url) else { return }
 
-    Alamofire.request(chordUrl)
-      .responseString(completionHandler: {response in
-        switch response.result {
-        case .success(let string):
-          self.parseChords(
-            string: string,
-            artist: artist,
-            song: song)
-        case .failure:
-          return
-        }
-      })
+    Alamofire.request(chordUrl).responseString(completionHandler: {response in
+      switch response.result {
+      case .success(let string):
+        self.parseChords(
+          string: string,
+          artist: artist,
+          song: song)
+      case .failure:
+        return
+      }
+    })
   }
 
   private func parseChords(string: String, artist: String, song: String) {
@@ -152,11 +151,9 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
       .sorted(by: {
         (($0.xpath("./td/span/b[@class=\"ratdig\"]").first?.text ?? "") as NSString).intValue >
         (($1.xpath("./td/span/b[@class=\"ratdig\"]").first?.text ?? "") as NSString).intValue
-      })
-      .flatMap({ $0.xpath("./td/div/a[@class=\"song result-link\"]").first })
+      }).flatMap({ $0.xpath("./td/div/a[@class=\"song result-link\"]").first })
 
-    guard let url = chords.first?["href"]
-      else { return }
+    guard let url = chords.first?["href"] else { return }
 
     let notification = NSUserNotification()
     notification.title = "Chord Detected!"

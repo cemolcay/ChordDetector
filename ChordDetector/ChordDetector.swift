@@ -78,7 +78,7 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
       return []
     } set {
       var newHistory = newValue
-      if newHistory.count > 10 {
+      if newHistory.count > 20 {
         newHistory.removeFirst()
       }
 
@@ -169,9 +169,8 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
 
   // MARK: NSUserNotificationCenterDelegate
 
-  func userNotificationCenter(_ center: NSUserNotificationCenter, didActivate notification: NSUserNotification) {
+  func userNotificationCenter(_ center: NSUserNotificationCenter, didDeliver notification: NSUserNotification) {
     guard let historyItem = HistoryItem(notification: notification),
-      let url = URL(string: historyItem.url),
       notification.userInfo?["type"] as? String == "chord"
       else { return }
 
@@ -182,6 +181,13 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
         appdelegate.statusItem.menu = appdelegate.menu
       }
     }
+  }
+
+  func userNotificationCenter(_ center: NSUserNotificationCenter, didActivate notification: NSUserNotification) {
+    guard let historyItem = HistoryItem(notification: notification),
+      let url = URL(string: historyItem.url),
+      notification.userInfo?["type"] as? String == "chord"
+      else { return }
 
     // Open url
     NSWorkspace.shared().open(url)

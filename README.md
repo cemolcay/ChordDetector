@@ -13,7 +13,7 @@ Features
 ----
 
 - iTunes and Spotify support.
-- Saves up to 10 chords in history.
+- Saves up to 20 chords in history.
 - Presents a notification on notification center.
 - Searches `ultimate-guitar` to find top rated chord.
 

@@ -6,8 +6,9 @@ A tiny menu bar app that listens iTunes and Spotify to detect chords of songs!
 Demo
 ----
 
-![alt tag](https://github.com/cemolcay/ChordDetector/blob/master/ss.png?raw=true)
-
+![alt tag](https://github.com/cemolcay/ChordDetector/blob/master/ss.png?raw=true)  
+![alt tag](https://github.com/cemolcay/ChordDetector/blob/master/notif.png?raw=true)
+  
 Features
 ----
 

@@ -6,5 +6,16 @@
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
+  <key>com.apple.security.temporary-exception.apple-events</key>
+  <dict>
+    <key>com.apple.iTunes</key>
+    <array>
+      <string>com.apple.iTunes.playerInfo</string>
+    </array>
+    <key>com.spotify.client</key>
+    <array>
+      <string>com.spotify.client.PlaybackStateChanged</string>
+    </array>
+  </dict>
 </dict>
 </plist>

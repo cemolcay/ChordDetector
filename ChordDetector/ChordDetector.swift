@@ -20,6 +20,7 @@ class HistoryItem: NSObject, NSCoding {
     self.name = name
     self.url = url
     super.init()
+
   }
 
   convenience init?(notification: NSUserNotification) {
@@ -147,11 +148,11 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
   private func parseChords(string: String, artist: String, song: String) {
     guard let html = HTML(html: string, encoding: .utf8) else { return }
     let chords = html
-      .xpath("//table[@class=\"tresults\"]//tr[contains(.,\"chords\")]")
+      .xpath("//table[@class=\"tresults  \"]//tr[contains(.,\"chords\")]")
       .sorted(by: {
         (($0.xpath("./td/span/b[@class=\"ratdig\"]").first?.text ?? "") as NSString).intValue >
         (($1.xpath("./td/span/b[@class=\"ratdig\"]").first?.text ?? "") as NSString).intValue
-      }).flatMap({ $0.xpath("./td/div/a[@class=\"song result-link\"]").first })
+      }).flatMap({ $0.xpath("./td/div/a[@class=\"song result-link js-search-spelling-link\"]").first })
 
     guard let url = chords.first?["href"] else { return }
 

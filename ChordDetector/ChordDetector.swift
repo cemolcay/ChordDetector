@@ -147,6 +147,8 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
 
   private func parseChords(string: String, artist: String, song: String) {
     guard let html = HTML(html: string, encoding: .utf8) else { return }
+
+    // Get chord rows from result table sorted by their rating and parse their urls
     let chords = html
       .xpath("//table[@class=\"tresults  \"]//tr[contains(.,\"chords\")]")
       .sorted(by: {
@@ -154,8 +156,10 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
         (($1.xpath("./td/span/b[@class=\"ratdig\"]").first?.text ?? "") as NSString).intValue
       }).flatMap({ $0.xpath("./td/div/a[@class=\"song result-link js-search-spelling-link\"]").first })
 
+    // Get most rated chord url
     guard let url = chords.first?["href"] else { return }
 
+    // Push a notification after 1sec of song change to bypass iTunes/Spotify notification.
     let notification = NSUserNotification()
     notification.title = "Chord Detected!"
     notification.informativeText = "\(artist) - \(song)"
@@ -165,6 +169,18 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
       "url": url,
     ]
 
+    Timer.scheduledTimer(
+      timeInterval: 1,
+      target: self,
+      selector: #selector(fireNotification(timer:)),
+      userInfo: ["notification": notification],
+      repeats: false)
+  }
+
+  func fireNotification(timer: Timer) {
+    guard let dict = timer.userInfo as? [String: Any],
+      let notification = dict["notification"] as? NSUserNotification
+      else { return }
     NSUserNotificationCenter.default.deliver(notification)
   }
 

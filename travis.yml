@@ -1,0 +1,12 @@
+language: objective-c
+
+workspace: ChordDetector.xcworkspace
+scheme: ChordDetector
+test_scheme: ChordDetectorTests
+osx_image: xcode8.3
+xcode_sdk: macosx10.12
+
+script:
+  - pod install
+  - xcodebuild -workspace {workspace}.xcworkspace -scheme {scheme} ONLY_ACTIVE_ARCH=NO
+  - xcodebuild test -workspace {workspace}.xcworkspace -scheme {test_scheme} ONLY_ACTIVE_ARCH=NO

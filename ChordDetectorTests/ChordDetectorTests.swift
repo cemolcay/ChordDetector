@@ -19,22 +19,31 @@ class ChordDetectorTests: XCTestCase {
     url += "\(artist.replacingOccurrences(of: " ", with: "+"))+"
     url += "\(song.replacingOccurrences(of: " ", with: "+"))"
 
-    guard let chordUrl = URL(string: url) else { return XCTFail("URL not parsed") }
+    guard let chordUrl = URL(string: url) else { return XCTFail("URL not parsed.") }
 
     Alamofire.request(chordUrl).responseString(completionHandler: {response in
       switch response.result {
       case .success(let string):
         guard let html = HTML(html: string, encoding: .utf8) else { return XCTFail("HTML not parsed.") }
+
+        // Parse chord rows in result table and sort them in order to rating
         let chords = html
           .xpath("//table[@class=\"tresults  \"]//tr[contains(.,\"chords\")]")
           .sorted(by: {
             (($0.xpath("./td/span/b[@class=\"ratdig\"]").first?.text ?? "") as NSString).intValue >
               (($1.xpath("./td/span/b[@class=\"ratdig\"]").first?.text ?? "") as NSString).intValue
-          }).flatMap({ $0.xpath("./td/div/a[@class=\"song result-link js-search-spelling-link\"]").first })
+          })
+        XCTAssertGreaterThan(chords.count, 0, "No chord found.")
 
-        let url = chords.first?["href"]
-        XCTAssertNotNil(url, "Chord not found.")
+        // Parse urls of chord rows
+        let urls = chords.flatMap({ $0.xpath("./td/div/a[@class=\"song result-link js-search-spelling-link\"]").first })
+        XCTAssertGreaterThan(urls.count, 0, "Chord URLs not parsed.")
+
+        // Get most rated chord url
+        let url = urls.first?["href"]
+        XCTAssertNotNil(url, "Chord URL not found.")
       case .failure:
+        // Request error
         XCTFail("URL Request error. Check internet connection.")
       }
     })

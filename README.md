@@ -1,8 +1,11 @@
 ChordDetector 
 ===
 
-[![Build Status](https://travis-ci.org/cemolcay/ChordDetector.svg?branch=master)](https://travis-ci.org/cemolcay/ChordDetector)  
+[![Build Status](https://travis-ci.org/cemolcay/ChordDetector.svg?branch=master)](https://travis-ci.org/cemolcay/ChordDetector)
+
 A tiny menu bar app that listens iTunes and Spotify to detect chords of songs!
+  
+[![alt tag](https://linkmaker.itunes.apple.com/assets/shared/badges/en-us/macappstore-lrg.svg)](https://geo.itunes.apple.com/us/app/chord-detector/id1219549675?mt=12)
 
 Demo
 ----

@@ -29,13 +29,13 @@ class ChordDetectorTests: XCTestCase {
       .value: "1",
       .secure: "TRUE",
       .expires: Date(timeIntervalSinceNow: 365*24*60)
-      ]) else { XCTFail("Old ultimate-guitar cookie no set.") }
+      ]) else { fatalError("Old ultimate-guitar cookie no set.") }
     Alamofire.SessionManager.default.session.configuration.httpCookieStorage?.setCookie(cookie)
 
     Alamofire.request(chordUrl).responseString(completionHandler: {response in
       switch response.result {
       case .success(let string):
-        guard let html = HTML(html: string, encoding: .utf8) else { return XCTFail("HTML not parsed.") }
+        guard let html = try? HTML(html: string, encoding: .utf8) else { return XCTFail("HTML not parsed.") }
 
         // Parse chord rows in result table and sort them in order to rating
         let chords = html

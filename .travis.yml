@@ -6,6 +6,9 @@ test_scheme: ChordDetectorTests
 osx_image: xcode9
 xcode_sdk: macosx10.12
 
+before_install:
+- gem install cocoapods
+
 script:
   - pod repo update
   - pod install

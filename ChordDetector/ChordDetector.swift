@@ -156,7 +156,7 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
   }
 
   private func parseChords(string: String, artist: String, song: String) {
-    guard let html = HTML(html: string, encoding: .utf8) else { return }
+    guard let html = try? HTML(html: string, encoding: .utf8) else { return }
 
     // Get chord rows from result table sorted by their rating and parse their urls
     let chords = html

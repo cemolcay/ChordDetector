@@ -13,14 +13,14 @@ import Crashlytics
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
   let detector = ChordDetector.shared
-  let statusItem = NSStatusBar.system().statusItem(withLength: -2)
+  let statusItem = NSStatusBar.system.statusItem(withLength: -2)
 
   func applicationDidFinishLaunching(_ aNotification: Notification) {
 
     // StatusBarItem
     statusItem.menu = menu
     if let button = statusItem.button {
-      button.image = NSImage(named: "menuBar")
+      button.image = NSImage(named: NSImage.Name(rawValue: "menuBar"))
       button.imageScaling = .scaleProportionallyUpOrDown
     }
 
@@ -64,12 +64,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     return menu
   }
 
-  func historyItemDidPress(sender: NSMenuItem) {
+  @objc func historyItemDidPress(sender: NSMenuItem) {
     guard let url = URL(string: detector.history[sender.tag].url) else { return }
-    NSWorkspace.shared().open(url)
+    NSWorkspace.shared.open(url)
   }
 
-  func clearHistoryDidPress() {
+  @objc func clearHistoryDidPress() {
     detector.history = []
     statusItem.menu = menu
   }

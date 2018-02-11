@@ -21,10 +21,21 @@ class ChordDetectorTests: XCTestCase {
 
     guard let chordUrl = URL(string: url) else { return XCTFail("URL not parsed.") }
 
+    // Set old ultimate-gutar cookie
+    guard let cookie = HTTPCookie(properties: [
+      .domain: "www.ultimate-guitar.com",
+      .path: "/",
+      .name: "back_to_classic_ug",
+      .value: "1",
+      .secure: "TRUE",
+      .expires: Date(timeIntervalSinceNow: 365*24*60)
+      ]) else { fatalError("Old ultimate-guitar cookie no set.") }
+    Alamofire.SessionManager.default.session.configuration.httpCookieStorage?.setCookie(cookie)
+
     Alamofire.request(chordUrl).responseString(completionHandler: {response in
       switch response.result {
       case .success(let string):
-        guard let html = HTML(html: string, encoding: .utf8) else { return XCTFail("HTML not parsed.") }
+        guard let html = try? HTML(html: string, encoding: .utf8) else { return XCTFail("HTML not parsed.") }
 
         // Parse chord rows in result table and sort them in order to rating
         let chords = html

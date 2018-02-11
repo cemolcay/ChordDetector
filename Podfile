@@ -3,14 +3,14 @@
 
 target 'ChordDetector' do
   use_frameworks!
-  pod 'Alamofire', '~> 4.4'
-  pod 'Kanna'
+  pod 'Alamofire'
+  pod 'Kanna', :git => 'https://github.com/tid-kijyun/Kanna.git', :branch => 'feature/v4.0.0'
   pod 'Fabric'
   pod 'Crashlytics'
 end
 
 target 'ChordDetectorTests' do
   use_frameworks!
-  pod 'Alamofire', '~> 4.4'
-  pod 'Kanna'
+  pod 'Alamofire'
+  pod 'Kanna', :git => 'https://github.com/tid-kijyun/Kanna.git', :branch => 'feature/v4.0.0'
 end

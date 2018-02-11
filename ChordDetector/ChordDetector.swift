@@ -98,6 +98,16 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
       spotifyNotificationName,
       itunesNotificationName,
     ])
+
+    guard let cookie = HTTPCookie(properties: [
+      .domain: "www.ultimate-guitar.com",
+      .path: "/",
+      .name: "back_to_classic_ug",
+      .value: "1",
+      .secure: "TRUE",
+      .expires: Date(timeIntervalSinceNow: 365*24*60)
+    ]) else { return }
+    Alamofire.SessionManager.default.session.configuration.httpCookieStorage?.setCookie(cookie)
   }
 
  // MARK: Player Notifications
@@ -146,7 +156,7 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
   }
 
   private func parseChords(string: String, artist: String, song: String) {
-    guard let html = HTML(html: string, encoding: .utf8) else { return }
+    guard let html = try? HTML(html: string, encoding: .utf8) else { return }
 
     // Get chord rows from result table sorted by their rating and parse their urls
     let chords = html
@@ -177,7 +187,7 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
       repeats: false)
   }
 
-  func fireNotification(timer: Timer) {
+  @objc func fireNotification(timer: Timer) {
     guard let dict = timer.userInfo as? [String: Any],
       let notification = dict["notification"] as? NSUserNotification
       else { return }
@@ -194,7 +204,7 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
     // Update history
     if !history.contains(historyItem) {
       history.append(historyItem)
-      if let appdelegate = NSApplication.shared().delegate as? AppDelegate {
+      if let appdelegate = NSApplication.shared.delegate as? AppDelegate {
         appdelegate.statusItem.menu = appdelegate.menu
       }
     }
@@ -207,6 +217,6 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
       else { return }
 
     // Open url
-    NSWorkspace.shared().open(url)
+    NSWorkspace.shared.open(url)
   }
 }

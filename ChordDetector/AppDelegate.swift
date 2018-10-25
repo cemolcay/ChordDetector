@@ -20,7 +20,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // StatusBarItem
     statusItem.menu = menu
     if let button = statusItem.button {
-      button.image = NSImage(named: NSImage.Name(rawValue: "menuBar"))
+      button.image = NSImage(named: "menuBar")
       button.imageScaling = .scaleProportionallyUpOrDown
     }
 

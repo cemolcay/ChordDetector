@@ -9,48 +9,30 @@
 import Cocoa
 import Alamofire
 import Kanna
+import SwiftyJSON
 
 // MARK: - HistoryItem
 
-class HistoryItem: NSObject, NSCoding {
+struct HistoryItem: Codable, Equatable {
   var name: String
   var url: String
 
   init(name: String, url: String) {
     self.name = name
     self.url = url
-    super.init()
-
   }
 
-  convenience init?(notification: NSUserNotification) {
+  init?(notification: NSUserNotification) {
     guard let name = notification.userInfo?["name"] as? String,
       let url = notification.userInfo?["url"] as? String
       else { return nil }
-    self.init(name: name, url: url)
-  }
-
-  // MARK: NSCoding
-
-  required convenience init?(coder aDecoder: NSCoder) {
-    guard let name = aDecoder.decodeObject(forKey: "name") as? String,
-      let url = aDecoder.decodeObject(forKey: "url") as? String
-      else { return nil }
-    self.init(name: name, url: url)
-  }
-
-  func encode(with aCoder: NSCoder) {
-    aCoder.encode(name, forKey: "name")
-    aCoder.encode(url, forKey: "url")
+    self = HistoryItem(name: name, url: url)
   }
 
   // MARK: Equatable
 
-  override func isEqual(_ object: Any?) -> Bool {
-    if let item = object as? HistoryItem {
-      return item.name == name && item.url == url
-    }
-    return super.isEqual(object)
+  static func == (lhs: HistoryItem, rhs: HistoryItem) -> Bool {
+    return lhs.name == rhs.name && lhs.url == rhs.url
   }
 }
 
@@ -67,14 +49,15 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
 
   var history: [HistoryItem] {
     get {
-      if let data = UserDefaults.standard.object(forKey: historyKey) as? Data,
-        let history = NSKeyedUnarchiver.unarchiveObject(with: data) as? [HistoryItem] {
+      if let data = UserDefaults.standard.data(forKey: historyKey),
+        let history = try? PropertyListDecoder().decode([HistoryItem].self, from: data) {
         return history
       }
 
       // Create new
       let defaults = UserDefaults.standard
-      defaults.set(NSKeyedArchiver.archivedData(withRootObject: [HistoryItem]()), forKey: historyKey)
+      guard let data = try? PropertyListEncoder().encode([HistoryItem]()) else { return [] }
+      defaults.set(data, forKey: historyKey)
       defaults.synchronize()
       return []
     } set {
@@ -84,7 +67,8 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
       }
 
       let defaults = UserDefaults.standard
-      defaults.set(NSKeyedArchiver.archivedData(withRootObject: newHistory), forKey: historyKey)
+      guard let data = try? PropertyListEncoder().encode(newHistory) else { return }
+      defaults.set(data, forKey: historyKey)
       defaults.synchronize()
     }
   }
@@ -157,17 +141,28 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
 
   private func parseChords(string: String, artist: String, song: String) {
     guard let html = try? HTML(html: string, encoding: .utf8) else { return }
+    let regexPattern = "(?<= window.UGAPP.store.page = )(.*)(?=;)"
 
-    // Get chord rows from result table sorted by their rating and parse their urls
-    let chords = html
-      .xpath("//table[@class=\"tresults  \"]//tr[contains(.,\"chords\")]")
-      .sorted(by: {
-        (($0.xpath("./td/span/b[@class=\"ratdig\"]").first?.text ?? "") as NSString).intValue >
-        (($1.xpath("./td/span/b[@class=\"ratdig\"]").first?.text ?? "") as NSString).intValue
-      }).flatMap({ $0.xpath("./td/div/a[@class=\"song result-link js-search-spelling-link\"]").first })
+    guard
+      let script = html.xpath("//script")
+        .compactMap({ $0.text })
+        .filter({ $0.contains("window.UGAPP.store.page") })
+        .first,
+      let regex = try? NSRegularExpression(pattern: regexPattern, options: []),
+      let match = regex.firstMatch(in: script, options: [], range: NSRange(0..<script.count)),
+      let matchRange = Range(match.range(at: 0), in: script)
+      else { return  }
 
-    // Get most rated chord url
-    guard let url = chords.first?["href"] else { return }
+    let jsonString = String(script[matchRange])
+    let json = JSON(parseJSON: jsonString)
+    let results = json["data"]["results"]
+
+    guard let result = results
+      .filter({ $1["type"].stringValue == "Chords" })
+      .sorted(by: { $0.1["rating"].doubleValue > $1.1["rating"].doubleValue })
+      .first.map({ $0.1 }),
+      let url = result["tab_url"].url
+      else { return }
 
     // Push a notification after 1sec of song change to bypass iTunes/Spotify notification.
     let notification = NSUserNotification()
@@ -176,11 +171,11 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
     notification.userInfo = [
       "type": "chord",
       "name": "\(artist) - \(song)",
-      "url": url,
+      "url": url.absoluteString,
     ]
 
     Timer.scheduledTimer(
-      timeInterval: 1,
+      timeInterval: 5,
       target: self,
       selector: #selector(fireNotification(timer:)),
       userInfo: ["notification": notification],

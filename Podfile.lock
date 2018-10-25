@@ -1,32 +1,33 @@
 PODS:
-  - Alamofire (4.6.0)
-  - Crashlytics (3.10.0):
-    - Fabric (~> 1.7.3)
-  - Fabric (1.7.3)
-  - Kanna (4.0.0)
+  - Alamofire (4.7.3)
+  - Crashlytics (3.11.0):
+    - Fabric (~> 1.8.0)
+  - Fabric (1.8.0)
+  - Kanna (4.0.2)
+  - SwiftyJSON (4.2.0)
 
 DEPENDENCIES:
   - Alamofire
   - Crashlytics
   - Fabric
-  - Kanna (from `https://github.com/tid-kijyun/Kanna.git`, branch `feature/v4.0.0`)
+  - Kanna
+  - SwiftyJSON
 
-EXTERNAL SOURCES:
-  Kanna:
-    :branch: feature/v4.0.0
-    :git: https://github.com/tid-kijyun/Kanna.git
-
-CHECKOUT OPTIONS:
-  Kanna:
-    :commit: d14801345da8998d4da4a071006fb7746de3d1eb
-    :git: https://github.com/tid-kijyun/Kanna.git
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Alamofire
+    - Crashlytics
+    - Fabric
+    - Kanna
+    - SwiftyJSON
 
 SPEC CHECKSUMS:
-  Alamofire: f41a599bd63041760b26d393ec1069d9d7b917f4
-  Crashlytics: a989ef242b66605577a425733797f810bd2725eb
-  Fabric: bb495bb9a7a7677c6d03a1f8b83d95bc49b47e41
-  Kanna: d5ae2a26472f7e7a474e7f36a9cd8aa2c8c63ad3
+  Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
+  Crashlytics: 1448070c1d2731ab71ea7c3faf84ac0f69657287
+  Fabric: 4ac1cdfef3004ccd83ce0959b91eda8a6e37df72
+  Kanna: c60b61d72554bf04ed1ee074f9b379855cab4892
+  SwiftyJSON: c4bcba26dd9ec7a027fc8eade48e2c911f229e96
 
-PODFILE CHECKSUM: 52c463df8cc5060b662c2ce03b2245a18808c209
+PODFILE CHECKSUM: a1c82a54e0b8323c71acc948e6b63cc637a6fba7
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.6.0.beta.1

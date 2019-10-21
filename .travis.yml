@@ -3,7 +3,7 @@ language: objective-c
 workspace: ChordDetector.xcworkspace
 scheme: ChordDetector
 test_scheme: ChordDetectorTests
-osx_image: xcode10
+osx_image: xcode11
 xcode_sdk: macosx10.14
 
 before_install:

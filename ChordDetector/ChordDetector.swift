@@ -7,9 +7,7 @@
 //
 
 import Cocoa
-import Alamofire
-import Kanna
-import SwiftyJSON
+import WebKit
 
 // MARK: - HistoryItem
 
@@ -38,12 +36,14 @@ struct HistoryItem: Codable, Equatable {
 
 // MARK: - ChordDetector
 
-class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
+class ChordDetector: NSObject, NSUserNotificationCenterDelegate, WKNavigationDelegate {
   static let shared = ChordDetector()
 
   private let spotifyNotificationName = "com.spotify.client.PlaybackStateChanged"
   private let itunesNotificationName = "com.apple.iTunes.playerInfo"
   private let historyKey = "history"
+
+  let webView = WKWebView()
 
   // MARK: History
 
@@ -77,21 +77,12 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
 
   override init() {
     super.init()
+    webView.navigationDelegate = self
     NSUserNotificationCenter.default.delegate = self
     registerNotifications(for: [
       spotifyNotificationName,
       itunesNotificationName,
     ])
-
-    guard let cookie = HTTPCookie(properties: [
-      .domain: "www.ultimate-guitar.com",
-      .path: "/",
-      .name: "back_to_classic_ug",
-      .value: "1",
-      .secure: "TRUE",
-      .expires: Date(timeIntervalSinceNow: 365*24*60)
-    ]) else { return }
-    Alamofire.SessionManager.default.session.configuration.httpCookieStorage?.setCookie(cookie)
   }
 
  // MARK: Player Notifications
@@ -112,81 +103,42 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate {
       notification.userInfo?["Player State"] as? String == "Playing"
       else { return }
 
-    getChords(
-      artist: artist,
-      song: song)
-  }
-
-  // MARK: Chord Detection
-
-  private func getChords(artist: String, song: String) {
     var url = "https://www.ultimate-guitar.com/search.php?search_type=title&order=&value="
     url += "\(artist.replacingOccurrences(of: " ", with: "+"))+"
     url += "\(song.replacingOccurrences(of: " ", with: "+"))"
-
     guard let chordUrl = URL(string: url) else { return }
+    webView.load(URLRequest(url: chordUrl))
+  }
 
-    Alamofire.request(chordUrl).responseString(completionHandler: {response in
-      switch response.result {
-      case .success(let string):
-        self.parseChords(
-          string: string,
-          artist: artist,
-          song: song)
-      case .failure:
-        return
-      }
+  // MARK: WKNavigationDelegate
+
+  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    let js = """
+    window.UGAPP.store.page.data.results
+      .filter(function(item){ return (item.type == "Chords") })
+      .sort(function(a, b){ return b.rating > a.rating })[0]
+    """
+    webView.evaluateJavaScript(js, completionHandler: { result, error in
+      guard let json = result as? [String: Any],
+        error == nil
+        else { return }
+
+      guard let url = json["tab_url"] as? String,
+        let artist = json["artist_name"] as? String,
+        let song = json["song_name"] as? String
+       else { return }
+
+      // Push a notification.
+      let notification = NSUserNotification()
+      notification.title = "Chord Detected!"
+      notification.informativeText = "\(artist) - \(song)"
+      notification.userInfo = [
+        "type": "chord",
+        "name": "\(artist) - \(song)",
+        "url": url,
+      ]
+      NSUserNotificationCenter.default.deliver(notification)
     })
-  }
-
-  private func parseChords(string: String, artist: String, song: String) {
-    guard let html = try? HTML(html: string, encoding: .utf8) else { return }
-    let regexPattern = "(?<= window.UGAPP.store.page = )(.*)(?=;)"
-
-    guard
-      let script = html.xpath("//script")
-        .compactMap({ $0.text })
-        .filter({ $0.contains("window.UGAPP.store.page") })
-        .first,
-      let regex = try? NSRegularExpression(pattern: regexPattern, options: []),
-      let match = regex.firstMatch(in: script, options: [], range: NSRange(0..<script.count)),
-      let matchRange = Range(match.range(at: 0), in: script)
-      else { return  }
-
-    let jsonString = String(script[matchRange])
-    let json = JSON(parseJSON: jsonString)
-    let results = json["data"]["results"]
-
-    guard let result = results
-      .filter({ $1["type"].stringValue == "Chords" })
-      .sorted(by: { $0.1["rating"].doubleValue > $1.1["rating"].doubleValue })
-      .first.map({ $0.1 }),
-      let url = result["tab_url"].url
-      else { return }
-
-    // Push a notification after 1sec of song change to bypass iTunes/Spotify notification.
-    let notification = NSUserNotification()
-    notification.title = "Chord Detected!"
-    notification.informativeText = "\(artist) - \(song)"
-    notification.userInfo = [
-      "type": "chord",
-      "name": "\(artist) - \(song)",
-      "url": url.absoluteString,
-    ]
-
-    Timer.scheduledTimer(
-      timeInterval: 5,
-      target: self,
-      selector: #selector(fireNotification(timer:)),
-      userInfo: ["notification": notification],
-      repeats: false)
-  }
-
-  @objc func fireNotification(timer: Timer) {
-    guard let dict = timer.userInfo as? [String: Any],
-      let notification = dict["notification"] as? NSUserNotification
-      else { return }
-    NSUserNotificationCenter.default.deliver(notification)
   }
 
   // MARK: NSUserNotificationCenterDelegate

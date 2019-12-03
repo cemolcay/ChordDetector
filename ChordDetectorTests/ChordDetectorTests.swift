@@ -7,75 +7,45 @@
 //
 
 import XCTest
-import Kanna
-import Alamofire
-import SwiftyJSON
+import WebKit
 
-class ChordDetectorTests: XCTestCase {
+class ChordDetectorTests: XCTestCase, WKNavigationDelegate {
+  var webView = WKWebView()
+  var wkExpectation = XCTestExpectation(description: "WKNavigationDelegate")
+  let artist = "The Animals"
+  let song = "House Of The Rising Sun"
 
   func testUltimateGuitarParse() {
-    let artist = "The Animals"
-    let song = "House of the rising sun"
     var url = "https://www.ultimate-guitar.com/search.php?search_type=title&order=&value="
     url += "\(artist.replacingOccurrences(of: " ", with: "+"))+"
     url += "\(song.replacingOccurrences(of: " ", with: "+"))"
 
     guard let chordUrl = URL(string: url) else { return XCTFail("URL not parsed.") }
+    webView.navigationDelegate = self
+    webView.load(URLRequest(url: chordUrl))
+    wait(for: [wkExpectation], timeout: 10.0)
+  }
 
-    // Set old ultimate-gutar cookie
-    guard let cookie = HTTPCookie(properties: [
-      .domain: "www.ultimate-guitar.com",
-      .path: "/",
-      .name: "back_to_classic_ug",
-      .value: "1",
-      .secure: "TRUE",
-      .expires: Date(timeIntervalSinceNow: 365*24*60)
-      ]) else { fatalError("Old ultimate-guitar cookie no set.") }
-    Alamofire.SessionManager.default.session.configuration.httpCookieStorage?.setCookie(cookie)
-    
-    // Make request
-    let networkExpectation = expectation(description: "UltimateGuitar network request expectation.")
-    Alamofire.request(chordUrl)
-    .responseString(completionHandler: { response in
-      switch response.result {
-      case .success(let string):
-        guard let html = try? HTML(html: string, encoding: .utf8)
-          else { return XCTFail("HTML not parsed.") }
+  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    let js = """
+    window.UGAPP.store.page.data.results
+      .filter(function(item){ return (item.type == "Chords") })
+      .sort(function(a, b){ return b.rating > a.rating })[0]
+    """
+    webView.evaluateJavaScript(js, completionHandler: { result, error in
+      guard let json = result as? [String: Any],
+        error == nil
+        else { return }
 
-        let regexPattern = "(?<= window.UGAPP.store.page = )(.*)(?=;)"
+      guard let url = json["tab_url"] as? String,
+        let artist = json["artist_name"] as? String,
+        let song = json["song_name"] as? String
+       else { return }
 
-        guard
-          let script = html.xpath("//script")
-            .compactMap({ $0.text })
-            .filter({ $0.contains("window.UGAPP.store.page") })
-            .first,
-          let regex = try? NSRegularExpression(pattern: regexPattern, options: []),
-          let match = regex.firstMatch(in: script, options: [], range: NSRange(0..<script.count)),
-          let matchRange = Range(match.range(at: 0), in: script)
-          else { return XCTFail("Can not find the window.UGAPP.store.page script.") }
-
-        let jsonString = String(script[matchRange])
-        let json = JSON(parseJSON: jsonString)
-        let results = json["data"]["results"]
-        XCTAssertGreaterThanOrEqual(results.count, 0, "JSON results can not parsed.")
-
-        guard let result = results
-          .filter({ $1["type"].stringValue == "Chords" })
-          .sorted(by: { $0.1["rating"].doubleValue > $1.1["rating"].doubleValue })
-          .first
-          .map({ $0.1 })
-          else { return XCTFail("Can not find the result") }
-
-        let url = result["tab_url"].url
-        XCTAssertNotNil(url, "Can not get the URL")
-        networkExpectation.fulfill()
-
-      case .failure:
-        // Request error
-        XCTFail("URL Request error. Check internet connection.")
-      }
+      XCTAssertEqual(self.artist, artist)
+      XCTAssertEqual(self.song, song)
+      XCTAssertNotNil(url, "Url is nil")
+      self.wkExpectation.fulfill()
     })
-
-    wait(for: [networkExpectation], timeout: 10.0)
   }
 }

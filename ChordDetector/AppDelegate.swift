@@ -7,8 +7,6 @@
 //
 
 import Cocoa
-import Fabric
-import Crashlytics
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -16,16 +14,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   let statusItem = NSStatusBar.system.statusItem(withLength: -2)
 
   func applicationDidFinishLaunching(_ aNotification: Notification) {
-
-    // StatusBarItem
     statusItem.menu = menu
     if let button = statusItem.button {
       button.image = NSImage(named: "menuBar")
       button.imageScaling = .scaleProportionallyUpOrDown
     }
-
-    // Fabric
-    Fabric.with([Crashlytics.self])
   }
 
   // MARK: Menu

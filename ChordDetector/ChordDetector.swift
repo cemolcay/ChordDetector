@@ -9,69 +9,114 @@
 import Cocoa
 import WebKit
 
-// MARK: - HistoryItem
+// MARK: - UGItem
 
-struct HistoryItem: Codable, Equatable {
-  var name: String
-  var url: String
+struct UGItem: Codable, Equatable {
+  let artist: String
+  let song: String
+  let url: URL
 
-  init(name: String, url: String) {
-    self.name = name
-    self.url = url
+  var title: String {
+    return "\(artist) - \(song)"
   }
 
-  init?(notification: NSUserNotification) {
-    guard let name = notification.userInfo?["name"] as? String,
-      let url = notification.userInfo?["url"] as? String
+  var dictionaryValue: [String: Any] {
+    guard let data = try? JSONEncoder().encode(self),
+      let dict = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+      else { return [:] }
+    return dict
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case artist = "artist_name"
+    case song = "song_name"
+    case url = "tab_url"
+  }
+
+  init(from decoder: Decoder) throws {
+    let values = try decoder.container(keyedBy: CodingKeys.self)
+    artist = try values.decode(String.self, forKey: .artist)
+    song = try values.decode(String.self, forKey: .song)
+    url = try values.decode(URL.self, forKey: .url)
+  }
+
+  init?(dict: [String: Any]) {
+    guard let data = try? JSONSerialization.data(withJSONObject: dict, options: []),
+      let item = try? JSONDecoder().decode(UGItem.self, from: data)
       else { return nil }
-    self = HistoryItem(name: name, url: url)
+    self = item
   }
 
-  // MARK: Equatable
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(artist, forKey: .artist)
+    try container.encode(song, forKey: .song)
+    try container.encode(url, forKey: .url)
+  }
 
-  static func == (lhs: HistoryItem, rhs: HistoryItem) -> Bool {
-    return lhs.name == rhs.name && lhs.url == rhs.url
+  func pushNotification() {
+    let notification = NSUserNotification()
+    notification.title = "Chord Detected!"
+    notification.informativeText = title
+    notification.userInfo = dictionaryValue
+    NSUserNotificationCenter.default.deliver(notification)
+  }
+}
+
+// MARK: - History
+
+class History {
+  private(set) var items: [UGItem]
+  private let historyKey = "history"
+  private let limit = 20
+
+  init() {
+    if let data = UserDefaults.standard.data(forKey: historyKey),
+      let history = try? PropertyListDecoder().decode([UGItem].self, from: data) {
+      items = history
+    } else {
+      items = []
+    }
+    persist()
+  }
+
+  func clear() {
+    items.removeAll()
+    persist()
+  }
+
+  func push(item: UGItem) {
+    guard items.contains(item) == false else { return }
+    items.append(item)
+    // Check limit
+    if items.count > limit {
+      items.removeFirst()
+    }
+    persist()
+  }
+
+  func persist() {
+    // Save
+    let defaults = UserDefaults.standard
+    guard let data = try? PropertyListEncoder().encode(items) else { return }
+    defaults.set(data, forKey: historyKey)
+    defaults.synchronize()
+    // Update UI
+    if let appdelegate = NSApplication.shared.delegate as? AppDelegate {
+      appdelegate.statusItem.menu = appdelegate.menu
+    }
   }
 }
 
 // MARK: - ChordDetector
 
-class ChordDetector: NSObject, NSUserNotificationCenterDelegate, WKNavigationDelegate {
+class ChordDetector: NSObject, WKNavigationDelegate, NSUserNotificationCenterDelegate {
   static let shared = ChordDetector()
+  let history = History()
+  let webView = WKWebView()
 
   private let spotifyNotificationName = "com.spotify.client.PlaybackStateChanged"
   private let itunesNotificationName = "com.apple.iTunes.playerInfo"
-  private let historyKey = "history"
-
-  let webView = WKWebView()
-
-  // MARK: History
-
-  var history: [HistoryItem] {
-    get {
-      if let data = UserDefaults.standard.data(forKey: historyKey),
-        let history = try? PropertyListDecoder().decode([HistoryItem].self, from: data) {
-        return history
-      }
-
-      // Create new
-      let defaults = UserDefaults.standard
-      guard let data = try? PropertyListEncoder().encode([HistoryItem]()) else { return [] }
-      defaults.set(data, forKey: historyKey)
-      defaults.synchronize()
-      return []
-    } set {
-      var newHistory = newValue
-      if newHistory.count > 20 {
-        newHistory.removeFirst()
-      }
-
-      let defaults = UserDefaults.standard
-      guard let data = try? PropertyListEncoder().encode(newHistory) else { return }
-      defaults.set(data, forKey: historyKey)
-      defaults.synchronize()
-    }
-  }
 
   // MARK: Lifecycle
 
@@ -102,10 +147,16 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate, WKNavigationDel
       let song = notification.userInfo?["Name"] as? String,
       notification.userInfo?["Player State"] as? String == "Playing"
       else { return }
+    searchChord(
+      artist: artist,
+      song: song)
+  }
 
+  func searchChord(artist: String, song: String) {
     var url = "https://www.ultimate-guitar.com/search.php?search_type=title&order=&value="
     url += "\(artist.replacingOccurrences(of: " ", with: "+"))+"
     url += "\(song.replacingOccurrences(of: " ", with: "+"))"
+
     guard let chordUrl = URL(string: url) else { return }
     webView.load(URLRequest(url: chordUrl))
   }
@@ -113,57 +164,29 @@ class ChordDetector: NSObject, NSUserNotificationCenterDelegate, WKNavigationDel
   // MARK: WKNavigationDelegate
 
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-    let js = """
+    let script = """
     window.UGAPP.store.page.data.results
       .filter(function(item){ return (item.type == "Chords") })
       .sort(function(a, b){ return b.rating > a.rating })[0]
     """
-    webView.evaluateJavaScript(js, completionHandler: { result, error in
-      guard let json = result as? [String: Any],
-        error == nil
+
+    webView.evaluateJavaScript(script, completionHandler: { result, error in
+      guard error == nil,
+        let result = result as? [String: Any],
+        let item = UGItem(dict: result)
         else { return }
-
-      guard let url = json["tab_url"] as? String,
-        let artist = json["artist_name"] as? String,
-        let song = json["song_name"] as? String
-       else { return }
-
-      // Push a notification.
-      let notification = NSUserNotification()
-      notification.title = "Chord Detected!"
-      notification.informativeText = "\(artist) - \(song)"
-      notification.userInfo = [
-        "type": "chord",
-        "name": "\(artist) - \(song)",
-        "url": url,
-      ]
-      NSUserNotificationCenter.default.deliver(notification)
+      item.pushNotification()
+      self.history.push(item: item)
     })
   }
 
   // MARK: NSUserNotificationCenterDelegate
 
-  func userNotificationCenter(_ center: NSUserNotificationCenter, didDeliver notification: NSUserNotification) {
-    guard let historyItem = HistoryItem(notification: notification),
-      notification.userInfo?["type"] as? String == "chord"
-      else { return }
-
-    // Update history
-    if !history.contains(historyItem) {
-      history.append(historyItem)
-      if let appdelegate = NSApplication.shared.delegate as? AppDelegate {
-        appdelegate.statusItem.menu = appdelegate.menu
-      }
-    }
-  }
-
   func userNotificationCenter(_ center: NSUserNotificationCenter, didActivate notification: NSUserNotification) {
-    guard let historyItem = HistoryItem(notification: notification),
-      let url = URL(string: historyItem.url),
-      notification.userInfo?["type"] as? String == "chord"
+    guard let dict = notification.userInfo,
+      let item = UGItem(dict: dict)
       else { return }
-
     // Open url
-    NSWorkspace.shared.open(url)
+    NSWorkspace.shared.open(item.url)
   }
 }

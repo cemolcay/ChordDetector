@@ -31,16 +31,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     historyTitleItem.isEnabled = false
     menu.addItem(historyTitleItem)
 
-    for (index, historyItem) in detector.history.enumerated() {
+    for (index, historyItem) in detector.history.items.enumerated() {
       let item = NSMenuItem(
-        title: historyItem.name,
+        title: historyItem.title,
         action: #selector(historyItemDidPress(sender:)),
         keyEquivalent: "")
       item.tag = index
       menu.addItem(item)
     }
 
-    if !detector.history.isEmpty {
+    if !detector.history.items.isEmpty {
       menu.addItem(
         withTitle: "Clear History",
         action: #selector(clearHistoryDidPress),
@@ -58,12 +58,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   }
 
   @objc func historyItemDidPress(sender: NSMenuItem) {
-    guard let url = URL(string: detector.history[sender.tag].url) else { return }
+    let url = detector.history.items[sender.tag].url
     NSWorkspace.shared.open(url)
   }
 
   @objc func clearHistoryDidPress() {
-    detector.history = []
+    detector.history.clear()
     statusItem.menu = menu
   }
 }

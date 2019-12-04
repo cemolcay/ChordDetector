@@ -8,6 +8,7 @@
 
 import XCTest
 import WebKit
+@testable import Chord_Detector
 
 class ChordDetectorTests: XCTestCase, WKNavigationDelegate {
   var webView = WKWebView()
@@ -35,16 +36,20 @@ class ChordDetectorTests: XCTestCase, WKNavigationDelegate {
     webView.evaluateJavaScript(js, completionHandler: { result, error in
       guard let json = result as? [String: Any],
         error == nil
-        else { return }
+        else { XCTFail("Can not evaluate javascript"); return }
 
       guard let url = json["tab_url"] as? String,
         let artist = json["artist_name"] as? String,
-        let song = json["song_name"] as? String
-       else { return }
+        let song = json["song_name"] as? String,
+        let item = UGItem(dict: json)
+        else { XCTFail("Can not serialize javascript object"); return }
 
       XCTAssertEqual(self.artist, artist)
       XCTAssertEqual(self.song, song)
-      XCTAssertNotNil(url, "Url is nil")
+      XCTAssertNotNil(URL(string: url), "Url is nil")
+      XCTAssertEqual(self.artist, item.artist)
+      XCTAssertEqual(self.song, item.song)
+      XCTAssertEqual(url, item.url.absoluteString)
       self.wkExpectation.fulfill()
     })
   }
